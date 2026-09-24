@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enqueue Hooks Demonstration</title>
+    <!-- Hook 1: Early CSS - Styles loaded in the head, blocking render until parsed -->
+    <!-- This simulates a global style that needs to be available immediately. -->
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: white;
+            margin-bottom: 15px;
+        }
+        .dynamic-content {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #e9ecef;
+            display: none; /* Initially hidden */
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+    <!-- Hook 2: Early JavaScript (deferred) - Script loaded in head, executes after HTML parsed -->
+    <!-- This simulates a script that needs to run after the DOM structure is ready but before rendering is blocked. -->
+    <script defer>
+        console.log("Hook 2: Script from <head> with 'defer' attribute executed.");
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Hook 2: DOMContentLoaded event fired. This script (deferred) runs before scripts at body end.");
+            const header = document.querySelector('.header');
+            if (header) {
+                header.textContent += " (Initialized by deferred script)";
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        Enqueue Hooks Demonstration
+    </div>
+
+    <div class="content">
+        <h2>Content Section 1</h2>
+        <p>This content is styled by CSS loaded early in the document head (Hook 1).</p>
+        <p>A deferred script in the head modified the header text after DOM was ready (Hook 2).</p>
+    </div>
+
+    <div class="content">
+        <h2>Content Section 2</h2>
+        <p>Click the button below to dynamically load a new script and apply new styles.</p>
+        <button id="loadDynamicContent">Load Dynamic Content</button>
+        <div id="dynamicContainer" class="dynamic-content">
+            <p>This content will appear after the dynamic script loads.</p>
+        </div>
+    </div>
+
+    <!-- Hook 3: Late JavaScript - Script loaded just before </body>, executes after all HTML above it is parsed -->
+    <!-- This simulates a script that can wait for all content to be rendered, often for performance. -->
+    <script>
+        console.log("Hook 3: Script from just before </body> executed.");
+        const loadButton = document.getElementById('loadDynamicContent');
+        if (loadButton) {
+            loadButton.addEventListener('click', () => {
+                console.log("Hook 4: User clicked button, initiating dynamic script/style load.");
+                // Hook 4: Dynamic/Conditional JavaScript and CSS loading
+                // This simulates loading resources only when needed, e.g., for a specific component or interaction.
+
+                // Simulate loading a new script
+                const dynamicScript = document.createElement('script');
+                dynamicScript.textContent = `
+                    console.log("Hook 4: Dynamically loaded script executed.");
+                    const dynamicContainer = document.getElementById('dynamicContainer');
+                    if (dynamicContainer) {
+                        dynamicContainer.style.display = 'block';
+                        dynamicContainer.innerHTML += '<p>This text was added by the dynamically loaded script!</p>';
+                    }
+                `;
+                document.body.appendChild(dynamicScript);
+
+                // Simulate loading a new style
+                const dynamicStyle = document.createElement('style');
+                dynamicStyle.textContent = `
+                    #dynamicContainer {
+                        background-color: #d4edda;
+                        color: #155724;
+                        border-color: #c3e6cb;
+                    }
+                `;
+                document.head.appendChild(dynamicStyle);
+            });
+        }
+    </script>
+</body>
+</html>
